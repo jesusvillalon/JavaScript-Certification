@@ -1,0 +1,136 @@
+<html>
+  <script>
+    function checkCashRegister(price, cash, cid) {
+      const currency_units = [
+        ["PENNY", 0.01],
+        ["NICKEL", 0.05],
+        ["DIME", 0.1],
+        ["QUARTER", 0.25],
+        ["ONE", 1],
+        ["FIVE", 5],
+        ["TEN", 10],
+        ["TWENTY", 20],
+        ["ONE HUNDRED", 100],
+      ];
+
+      let change_due = cash - price;
+      let cid_total = cid.reduce((total, unit) => total + unit[1], 0);
+
+      if (cid_total < change_due) {
+        return { status: "INSUFFICIENT_FUNDS", change: [] };
+      }
+
+      if (cid_total === change_due) {
+        return { status: "CLOSED", change: cid };
+      }
+
+      let change = [];
+      cid = Object.fromEntries(cid);
+
+      for (let i = currency_units.length - 1; i >= 0; i--) {
+        let unit_name = currency_units[i][0];
+        let unit_value = currency_units[i][1];
+
+        if (cid[unit_name] > 0) {
+          let unit_amount =
+            Math.min(
+              Math.floor(change_due / unit_value),
+              Math.floor(cid[unit_name] / unit_value)
+            ) * unit_value;
+
+          if (unit_amount > 0) {
+            change.push([unit_name, unit_amount]);
+            change_due -= unit_amount;
+            change_due = Math.round(change_due * 100) / 100;
+            cid[unit_name] -= unit_amount;
+          }
+        }
+      }
+
+      if (change_due > 0) {
+        return { status: "INSUFFICIENT_FUNDS", change: [] };
+      }
+
+      return { status: "OPEN", change: change };
+    }
+
+    console.log(
+      checkCashRegister(19.5, 20, [
+        ["PENNY", 1.01],
+        ["NICKEL", 2.05],
+        ["DIME", 3.1],
+        ["QUARTER", 4.25],
+        ["ONE", 90],
+        ["FIVE", 55],
+        ["TEN", 20],
+        ["TWENTY", 60],
+        ["ONE HUNDRED", 100],
+      ])
+    );
+    console.log(
+      checkCashRegister(19.5, 20, [
+        ["PENNY", 1.01],
+        ["NICKEL", 2.05],
+        ["DIME", 3.1],
+        ["QUARTER", 4.25],
+        ["ONE", 90],
+        ["FIVE", 55],
+        ["TEN", 20],
+        ["TWENTY", 60],
+        ["ONE HUNDRED", 100],
+      ])
+    );
+    console.log(
+      checkCashRegister(3.26, 100, [
+        ["PENNY", 1.01],
+        ["NICKEL", 2.05],
+        ["DIME", 3.1],
+        ["QUARTER", 4.25],
+        ["ONE", 90],
+        ["FIVE", 55],
+        ["TEN", 20],
+        ["TWENTY", 60],
+        ["ONE HUNDRED", 100],
+      ])
+    );
+    console.log(
+      checkCashRegister(19.5, 20, [
+        ["PENNY", 0.01],
+        ["NICKEL", 0],
+        ["DIME", 0],
+        ["QUARTER", 0],
+        ["ONE", 0],
+        ["FIVE", 0],
+        ["TEN", 0],
+        ["TWENTY", 0],
+        ["ONE HUNDRED", 0],
+      ])
+    );
+    console.log(
+      checkCashRegister(19.5, 20, [
+        ["PENNY", 0.01],
+        ["NICKEL", 0],
+        ["DIME", 0],
+        ["QUARTER", 0],
+        ["ONE", 1],
+        ["FIVE", 0],
+        ["TEN", 0],
+        ["TWENTY", 0],
+        ["ONE HUNDRED", 0],
+      ])
+    );
+    console.log(
+      checkCashRegister(19.5, 20, [
+        ["PENNY", 0.5],
+        ["NICKEL", 0],
+        ["DIME", 0],
+        ["QUARTER", 0],
+        ["ONE", 0],
+        ["FIVE", 0],
+        ["TEN", 0],
+        ["TWENTY", 0],
+        ["ONE HUNDRED", 0],
+      ])
+    );
+  </script>
+</html>
